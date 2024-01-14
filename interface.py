@@ -1,5 +1,5 @@
 import tkinter as tk
-import requests, json, csv
+import requests, json, csv, time, os
 from tkinter import *
 import matplotlib.pyplot as plt
 from  matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -19,7 +19,7 @@ def create_connection():
     finally:
         if conn:
             c=conn.cursor()
-            c.execute('''CREATE TABLE IF NOT EXISTS podaci (Team text, Tournament text, Goals integer, Shots integer, yellow_cards integer, red_card integer, Possession integer, Pass integer, AerialsWon integer, Rating integer)''')
+            c.execute('''CREATE TABLE IF NOT EXISTS podaci (Team text, Tournament text, Goals real, Shots real, yellow_cards real, red_card real, Possession real, Pass real, AerialsWon real, Rating real)''')
             print("Uspjesno kreirana tablica")
    
 
@@ -90,18 +90,22 @@ def spremiUBazu():
         if conn:
             c=conn.cursor()
             testPrint = c.execute('''SELECT * FROM podaci''')
+            EngleskaLiga.to_sql('podaci', conn, if_exists='replace', index=False)
+            #time.sleep(10)
+            italy.to_sql('podaci', conn, if_exists='replace', index=False)
             
+            print(italy)
             #print(helpData)
             for index in helpData.drop(0).index:
                 if(index == 0):
                     continue
                 print("Timovi su ",helpData[0][index])
                 #helpData2 = helpData.drop(0)
-                row = [helpData[0][index], helpData[1][index], helpData[2][index], helpData[3][index], helpData[4][index], helpData[5][index], helpData[6][index], helpData[7][index], helpData[8][index], helpData[9][index]]
-                print(row)
-                listaNova = list(row)
-                upit = "INSERT INTO podaci(Team, Tournament, Goals, Shots, yellow_cards, red_card, Possession, Pass, AerialsWon, Rating) VALUES ( " + helpData[0][index] + ", " + helpData[1][index] + ", " + helpData[2][index] + ", " + helpData[3][index] + ", " + helpData[4][index] + ", " + helpData[5][index] + ", " + helpData[6][index] + ", " + helpData[7][index] + ", " + helpData[8][index] + ", " + helpData[9][index] + ")"
-                c.execute(upit)
+                #row = [helpData[0][index], helpData[1][index], helpData[2][index], helpData[3][index], helpData[4][index], helpData[5][index], helpData[6][index], helpData[7][index], helpData[8][index], helpData[9][index]]
+                #print(row)
+                #listaNova = list(row)
+                #upit = "INSERT INTO podaci(Team, Tournament, Goals, Shots, yellow_cards, red_card, Possession, Pass, AerialsWon, Rating) VALUES ( " + helpData[0][index] + ", " + helpData[1][index] + ", " + helpData[2][index] + ", " + helpData[3][index] + ", " + helpData[4][index] + ", " + helpData[5][index] + ", " + helpData[6][index] + ", " + helpData[7][index] + ", " + helpData[8][index] + ", " + helpData[9][index] + ")"
+                #c.execute(upit)
             #print(helpData[0][0])
             #for row in helpData.drop(0):
             #    print(helpData[row])
@@ -109,7 +113,8 @@ def spremiUBazu():
             #for row in EngleskaLiga:
             #    print(row)
                 #c.execute('''INSERT INTO podaci(Team, Tournament, Goals, Shots, yellow_cards, red_card, Possession, Pass, AerialsWon, Rating) VALUES (?,?,?,?,?,?,?,?,?,?)''', row)
-            
+            italy.to_sql('podaci', conn, if_exists='replace', index=False)
+
 class GUI(tk.Tk):
     
     def __init__(self):
@@ -195,6 +200,7 @@ def main():
     spremiUBazu()
     
     appstart.mainloop()
+    os.remove('./database.db')
     appstart.destroy()
     
 
